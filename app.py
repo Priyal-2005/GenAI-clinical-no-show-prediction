@@ -1,10 +1,20 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import os
 
 # ==========================
 # Load Model and Scaler
 # ==========================
+
+# ADD ERROR HANDLING HERE (before loading):
+if not os.path.exists("best_model.pkl"):
+    st.error("Model file not found!")
+    st.stop()
+
+if not os.path.exists("scaler.pkl"):
+    st.error("Scaler file not found!")
+    st.stop()
 
 model = pickle.load(open("models/best_model.pkl", "rb"))
 scaler = pickle.load(open("models/scaler.pkl", "rb"))
