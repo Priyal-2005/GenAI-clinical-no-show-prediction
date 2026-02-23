@@ -92,17 +92,22 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-## Run The Streamlit App
+## 🏃‍♂️ Run The Streamlit App
 From the project root:
 ```bash
 streamlit run app.py
 ```
 
-Then open the local URL shown in the terminal (typically `http://localhost:8501`).
+Then open the local URL shown in the terminal (typically `http://localhost:8501`)
 
 
-## Notes
+## 📋 Notes
 - Model and scaler files are expected to exist before running the app.
 - The app performs binary prediction where:
   - `1` => `No-Show`
   - `0` => `Will Attend`
+
+---
+
+# 🔗 Hosted Link
+https://genai-clinical-no-show-prediction.streamlit.app/
