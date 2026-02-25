@@ -17,7 +17,8 @@ st.markdown("Predict the likelihood of a patient missing their appointment.")
 def load_model():
     try:
         model_path = os.path.join("models", "best_model.pkl")
-        model = pickle.load(open(model_path, "rb"))
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
         return model
     except Exception as e:
         st.error("Model file not found. Please check deployment.")
@@ -44,6 +45,7 @@ with col2:
     alcoholism = st.selectbox("Alcoholism", ["No", "Yes"])
     handicap = st.selectbox("Handicap", [0, 1, 2, 3, 4])
     sms_received = st.selectbox("SMS Reminder Sent", ["No", "Yes"])
+    scholarship = st.selectbox("Scholarship Program", ["No", "Yes"])
 
 st.markdown("---")
 
@@ -68,17 +70,22 @@ st.info(f"Calculated Waiting Days: {waiting_days}")
 # -----------------------------
 if st.button("Predict"):
 
-    # Encode categorical variables
+    day_of_week = appointment_date.weekday()
+
     input_data = pd.DataFrame([{
         "Gender": 1 if gender == "Male" else 0,
         "Age": age,
-        "Hypertension": 1 if hypertension == "Yes" else 0,
+        "Scholarship": 1 if scholarship == "Yes" else 0,
+        "Hipertension": 1 if hypertension == "Yes" else 0,
         "Diabetes": 1 if diabetes == "Yes" else 0,
         "Alcoholism": 1 if alcoholism == "Yes" else 0,
-        "Handicap": handicap,
+        "Handcap": handicap,
         "SMS_received": 1 if sms_received == "Yes" else 0,
-        "waiting_days": waiting_days
+        "waiting_days": waiting_days,
+        "appointment_day_of_week": day_of_week
     }])
+
+    input_data = input_data[model.feature_names_in_]
 
     prediction = model.predict(input_data)[0]
     probability = model.predict_proba(input_data)[0][1]
