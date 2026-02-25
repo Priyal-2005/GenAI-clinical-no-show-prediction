@@ -1,109 +1,56 @@
 import streamlit as st
-import pandas as pd
 import pickle
-import os
-from datetime import datetime
+import pandas as pd
 
-# -----------------------------
-# Page Config
-# -----------------------------
-st.set_page_config(page_title="Clinical No-Show Predictor", layout="centered")
-st.title("🏥 Clinical Appointment No-Show Prediction")
-st.markdown("Predict the likelihood of a patient missing their appointment.")
+# Load trained model
+with open("best_model.pkl", "rb") as f:
+    model = pickle.load(f)
 
-# -----------------------------
-# Load Model & Scaler
-# -----------------------------
-@st.cache_resource
-def load_model():
-    try:
-        if os.path.exists("models/best_model.pkl"):
-            model = pickle.load(open("models/best_model.pkl", "rb"))
-            scaler = pickle.load(open("models/scaler.pkl", "rb"))
-        else:
-            model = pickle.load(open("best_model.pkl", "rb"))
-            scaler = pickle.load(open("scaler.pkl", "rb"))
-        return model, scaler
-    except:
-        st.error("Model files not found.")
-        st.stop()
+st.title("Hospital Appointment No-Show Prediction")
 
-model, scaler = load_model()
+st.write("Enter patient details below to predict whether they will miss the appointment.")
 
-st.markdown("---")
+# ---- INPUT FIELDS ----
 
-# -----------------------------
-# User Inputs
-# -----------------------------
-st.subheader("📋 Patient Details")
+gender = st.selectbox("Gender", ["Female", "Male"])
+age = st.number_input("Age", min_value=0, max_value=100, value=30)
 
-col1, col2 = st.columns(2)
+hypertension = st.selectbox("Hypertension", [0, 1])
+diabetes = st.selectbox("Diabetes", [0, 1])
+alcoholism = st.selectbox("Alcoholism", [0, 1])
+handicap = st.selectbox("Handicap", [0, 1])
 
-with col1:
-    age = st.number_input("Age", 0, 120, 35)
-    gender = st.selectbox("Gender", ["Female", "Male"])
-    scholarship = st.selectbox("Scholarship Program", ["No", "Yes"])
-    hypertension = st.selectbox("Hypertension", ["No", "Yes"])
-    diabetes = st.selectbox("Diabetes", ["No", "Yes"])
+sms_received = st.selectbox("SMS Received", [0, 1])
 
-with col2:
-    alcoholism = st.selectbox("Alcoholism", ["No", "Yes"])
-    handcap = st.selectbox("Disability Level", [0,1,2,3,4])
-    sms_received = st.selectbox("SMS Reminder Sent", ["Yes", "No"])
+waiting_days = st.number_input("Waiting Days", min_value=0, max_value=365, value=5)
 
-st.markdown("---")
-st.subheader("📅 Appointment Details")
+# ---- PREDICTION ----
 
-scheduled_date = st.date_input("Scheduled Date")
-appointment_date = st.date_input("Appointment Date")
-
-if appointment_date < scheduled_date:
-    st.error("Appointment date cannot be before scheduled date.")
-    st.stop()
-
-waiting_days = (appointment_date - scheduled_date).days
-day_of_week = appointment_date.weekday()
-
-# -----------------------------
-# Prediction
-# -----------------------------
 if st.button("Predict"):
 
-    # Encode
-    input_data = pd.DataFrame({
-        "Gender": [1 if gender=="Male" else 0],
-        "Age": [age],
-        "Scholarship": [1 if scholarship=="Yes" else 0],
-        "Hipertension": [1 if hypertension=="Yes" else 0],
-        "Diabetes": [1 if diabetes=="Yes" else 0],
-        "Alcoholism": [1 if alcoholism=="Yes" else 0],
-        "Handcap": [handcap],
-        "SMS_received": [1 if sms_received=="Yes" else 0],
-        "waiting_days": [waiting_days],
-        "appointment_day_of_week": [day_of_week]
-    })
+    # Convert categorical inputs
+    gender = 1 if gender == "Male" else 0
 
-    input_scaled = scaler.transform(input_data)
-    prediction = model.predict(input_scaled)[0]
-    probability = model.predict_proba(input_scaled)[0][1]
+    # Create dataframe EXACTLY same order as training
+    input_data = pd.DataFrame([{
+        "Gender": gender,
+        "Age": age,
+        "Hypertension": hypertension,
+        "Diabetes": diabetes,
+        "Alcoholism": alcoholism,
+        "Handicap": handicap,
+        "SMS_received": sms_received,
+        "waiting_days": waiting_days
+    }])
 
-    st.markdown("---")
-    st.subheader("📊 Results")
+    prediction = model.predict(input_data)[0]
+    probability = model.predict_proba(input_data)[0][1]
+
+    st.subheader("Prediction Result")
 
     if prediction == 1:
-        st.error("⚠️ Likely to No-Show")
+        st.error(f"⚠ Patient likely to MISS appointment")
     else:
-        st.success("✅ Likely to Attend")
+        st.success(f"✅ Patient likely to ATTEND appointment")
 
-    st.metric("No-Show Probability", f"{probability*100:.2f}%")
-
-    st.markdown("---")
-
-    # Simple Recommendation
-    if probability > 0.6:
-        st.warning("Recommended Action: Send reminder call + SMS.")
-    else:
-        st.info("Standard reminder is sufficient.")
-
-st.markdown("---")
-st.caption("Decision Tree Model | Streamlit Deployment | NST Sonipat")
+    st.write(f"Probability of No-Show: {round(probability*100, 2)}%")
