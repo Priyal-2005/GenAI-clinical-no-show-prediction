@@ -111,4 +111,4 @@ if st.button("Predict"):
         st.success("Standard reminder protocol is sufficient.")
 
 st.markdown("---")
-st.caption("Tuned Random Forest Model | Streamlit Deployment | NST Sonipat")
+st.caption("Recall-Optimized Decision Tree | Streamlit Deployment | NST Sonipat")

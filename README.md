@@ -38,7 +38,8 @@ The dataset includes demographic, medical condition, and scheduling features.
 ## 🧠 Models Used
 
 - Logistic Regression  
-- Decision Tree (Best Model Selected using F1 Score)
+- Decision Tree
+- Random Forest
 
 Evaluation Metrics:
 - Accuracy
@@ -50,9 +51,9 @@ Evaluation Metrics:
 
 ### 🏆 Model Selection
 
-Due to class imbalance in the dataset, F1-score was used as the primary evaluation metric.
+Since missing high-risk no-show cases leads to wasted hospital resources and appointment slots, Recall was used as the primary evaluation metric.
 
-The Decision Tree model achieved the highest F1-score and was selected as the final deployment model.
+The Tuned Decision Tree model achieved the highest Recall and was selected as the final deployment model.
 
 
 ## 📊 Input Features Used in Deployment
