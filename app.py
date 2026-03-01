@@ -25,7 +25,7 @@ def load_model():
         st.stop()
 
 model = load_model()
-st.write("Model expects:", model.feature_names_in_)
+# st.write("Model expects:", model.feature_names_in_)
 
 st.markdown("---")
 
