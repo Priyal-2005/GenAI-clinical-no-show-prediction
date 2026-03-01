@@ -87,8 +87,11 @@ if st.button("Predict"):
     # Ensure correct feature order
     input_data = input_data[model.feature_names_in_]
 
-    prediction = model.predict(input_data)[0]
     probability = model.predict_proba(input_data)[0][1]
+
+    # Custom threshold for recall optimization
+    threshold = 0.35
+    prediction = 1 if probability > threshold else 0
 
     st.markdown("---")
     st.subheader("📊 Prediction Result")
