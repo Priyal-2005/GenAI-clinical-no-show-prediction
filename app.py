@@ -20,7 +20,7 @@ def load_model():
         with open(model_path, "rb") as f:
             model = pickle.load(f)
         return model
-    except Exception as e:
+    except Exception:
         st.error("Model file not found. Please check deployment.")
         st.stop()
 
@@ -62,7 +62,6 @@ if appointment_date < scheduled_date:
     st.stop()
 
 waiting_days = (appointment_date - scheduled_date).days
-
 st.info(f"Calculated Waiting Days: {waiting_days}")
 
 # -----------------------------
@@ -85,6 +84,7 @@ if st.button("Predict"):
         "appointment_day_of_week": day_of_week
     }])
 
+    # Ensure correct feature order
     input_data = input_data[model.feature_names_in_]
 
     prediction = model.predict(input_data)[0]
@@ -102,7 +102,7 @@ if st.button("Predict"):
 
     st.markdown("---")
 
-    # Business Recommendation
+    # Risk-based recommendation
     if probability > 0.65:
         st.warning("Recommended Action: Send Reminder Call + SMS Follow-up.")
     elif probability > 0.45:
