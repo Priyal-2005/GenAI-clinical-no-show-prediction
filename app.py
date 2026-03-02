@@ -3,16 +3,12 @@ import pandas as pd
 import pickle
 import os
 
-# -----------------------------
 # Page Config
-# -----------------------------
 st.set_page_config(page_title="Clinical No-Show Predictor", layout="centered")
 st.title("🏥 Clinical Appointment No-Show Prediction")
 st.markdown("Predict the likelihood of a patient missing their appointment.")
 
-# -----------------------------
 # Load Model
-# -----------------------------
 @st.cache_resource
 def load_model():
     try:
@@ -29,9 +25,7 @@ model = load_model()
 
 st.markdown("---")
 
-# -----------------------------
 # Patient Details
-# -----------------------------
 st.subheader("📋 Patient Details")
 
 col1, col2 = st.columns(2)
@@ -50,9 +44,7 @@ with col2:
 
 st.markdown("---")
 
-# -----------------------------
 # Appointment Details
-# -----------------------------
 st.subheader("📅 Appointment Details")
 
 scheduled_date = st.date_input("Scheduled Date")
@@ -65,9 +57,7 @@ if appointment_date < scheduled_date:
 waiting_days = (appointment_date - scheduled_date).days
 st.info(f"Calculated Waiting Days: {waiting_days}")
 
-# -----------------------------
 # Prediction
-# -----------------------------
 if st.button("Predict"):
 
     day_of_week = appointment_date.weekday()
